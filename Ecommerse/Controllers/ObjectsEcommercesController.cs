@@ -69,8 +69,8 @@ namespace Ecommerse.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
+            var response =NoContent();
+            return response;
         }
 
         // POST: api/ObjectsEcommerces

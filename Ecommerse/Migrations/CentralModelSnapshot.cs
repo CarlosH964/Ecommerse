@@ -41,6 +41,12 @@ namespace Ecommerse.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<int>("ObjectId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ObjectId"));
+
                     b.Property<float>("Price")
                         .HasColumnType("real");
 

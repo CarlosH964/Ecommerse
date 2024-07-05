@@ -8,6 +8,7 @@ namespace Ecommerse.Data
         public Central(DbContextOptions<Central> options) : base(options) { }
 
         public DbSet<ObjectsEcommerce> Ecommerce { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

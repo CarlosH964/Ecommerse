@@ -9,5 +9,6 @@
         public string Customer { get; set; }
         public float Price { get; set; }
         public int Stock { get; set; }
+        public string Img { get; set; }
     }
 }

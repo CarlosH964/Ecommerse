@@ -13,12 +13,7 @@ namespace Ecommerse.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ObjectsEcommerce>()
-                .Property(e => e.Id)
-                .ValueGeneratedOnAdd();
-
-            modelBuilder.Entity<ObjectsEcommerce>()
-                .Property(e => e.ObjectId)
-                .ValueGeneratedOnAdd();
+                .HasKey(e => e.Id);
         }
     }
 }

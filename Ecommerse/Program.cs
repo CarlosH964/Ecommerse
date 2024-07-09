@@ -7,7 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Configurar servicios y otros middleware
 builder.Services.AddDbContext<Central>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -28,6 +28,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseCors();
+
 // Configurar el pipeline HTTP
 if (app.Environment.IsDevelopment())
 {
@@ -35,8 +37,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TodoApi v1"));
 }
-
-app.UseCors();
 
 app.UseHttpsRedirection();
 

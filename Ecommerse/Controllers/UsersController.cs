@@ -79,6 +79,11 @@ namespace Ecommerse.Controllers
         [HttpPost]
         public async Task<ActionResult<User>> PostUser(User user)
         {
+            if (string.IsNullOrEmpty(user.Rol))
+            {
+                user.Rol = "user";
+            }
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 

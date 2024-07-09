@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Ecommerse.Data;
 using Ecommerse.Models;
+using Microsoft.AspNetCore.Identity.Data;
 
 namespace Ecommerse.Controllers
 {
@@ -99,6 +100,27 @@ namespace Ecommerse.Controllers
 
             return NoContent();
         }
+
+        // Método de inicio de sesión
+        [HttpPost("login")]
+        public async Task<ActionResult<User>> Login([FromBody] Models.LoginRequest loginRequest)
+        {
+            if (loginRequest == null || string.IsNullOrEmpty(loginRequest.Email) || string.IsNullOrEmpty(loginRequest.Password))
+            {
+                return BadRequest("Email and Password are required.");
+            }
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == loginRequest.Email && u.Password == loginRequest.Password);
+
+            if (user == null)
+            {
+                return Unauthorized("Invalid email or password.");
+            }
+
+            return Ok(user);
+        }
+
 
         private bool UserExists(int id)
         {

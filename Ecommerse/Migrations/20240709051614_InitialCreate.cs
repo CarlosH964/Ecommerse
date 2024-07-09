@@ -23,11 +23,28 @@ namespace Ecommerse.Migrations
                     Description = table.Column<string>(type: "text", nullable: false),
                     Customer = table.Column<string>(type: "text", nullable: false),
                     Price = table.Column<float>(type: "real", nullable: false),
-                    Stock = table.Column<int>(type: "integer", nullable: false)
+                    Stock = table.Column<int>(type: "integer", nullable: false),
+                    Img = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Ecommerce", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: false),
+                    Rol = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
                 });
         }
 
@@ -36,6 +53,9 @@ namespace Ecommerse.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Ecommerce");
+
+            migrationBuilder.DropTable(
+                name: "Users");
         }
     }
 }

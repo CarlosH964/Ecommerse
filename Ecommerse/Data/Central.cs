@@ -9,6 +9,7 @@ namespace Ecommerse.Data
 
         public DbSet<ObjectsEcommerce> Ecommerce { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<Ventas> Ventas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

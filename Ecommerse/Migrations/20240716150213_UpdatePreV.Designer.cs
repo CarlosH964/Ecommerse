@@ -4,6 +4,7 @@ using Ecommerse.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerse.Migrations
 {
     [DbContext(typeof(Central))]
-    partial class CentralModelSnapshot : ModelSnapshot
+    [Migration("20240716150213_UpdatePreV")]
+    partial class UpdatePreV
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,8 +79,6 @@ namespace Ecommerse.Migrations
 
                     b.HasKey("PrevId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("PreV");
                 });
 
@@ -134,17 +135,6 @@ namespace Ecommerse.Migrations
                     b.HasIndex("ItemsId");
 
                     b.ToTable("Ventas");
-                });
-
-            modelBuilder.Entity("Ecommerse.Models.PreV", b =>
-                {
-                    b.HasOne("Ecommerse.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Ecommerse.Models.Ventas", b =>

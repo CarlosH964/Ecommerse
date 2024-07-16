@@ -6,15 +6,13 @@ namespace Ecommerse.Data
     public class Central : DbContext
     {
         public Central(DbContextOptions<Central> options) : base(options) { }
-
-        public DbSet<ObjectsEcommerce> Ecommerce { get; set; }
+        public DbSet<Items> Items { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Ventas> Ventas { get; set; }
+        public DbSet<PreV> PreV { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ObjectsEcommerce>()
-                .HasKey(e => e.Id);
         }
     }
 }

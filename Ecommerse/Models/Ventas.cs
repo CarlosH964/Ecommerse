@@ -1,14 +1,22 @@
-﻿namespace Ecommerse.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Ecommerse.Models
 {
     public class Ventas
     {
-        public int Id { get; set; }
-        public int ObjectId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Customer { get; set; }
-        public float Price { get; set; }
-        public int Stock { get; set; }
-        public string Img { get; set; }
+        [Key]
+        public int VentaDId { get; set; }
+
+        [ForeignKey("Items")]
+        public int ItemsId { get; set; }
+        public Items Items { get; set; }
+
+        [ForeignKey("Prev")]
+        public int IdPrev { get; set; }
+        public PreV Prev { get; set; }
+
+        public int Total { get; set; }
+
     }
 }

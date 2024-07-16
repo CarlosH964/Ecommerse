@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Ecommerse.Data;
 using Ecommerse.Models;
-using Microsoft.AspNetCore.Identity.Data;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Ecommerse.Controllers
 {
@@ -17,42 +14,110 @@ namespace Ecommerse.Controllers
     {
         private readonly Central _context;
 
-        public VentasController(Central context) 
+        public VentasController(Central context)
         {
             _context = context;
         }
 
-        //GET
+        // GET: api/Ventas
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Ventas>>> GetVentas() 
+        public async Task<ActionResult<IEnumerable<VentasResponseModel>>> GetVentas()
         {
-            return await _context.Ventas.ToListAsync();
+            var ventas = await _context.Ventas
+                .Include(v => v.Items)
+                .Include(v => v.Prev)
+                    .ThenInclude(p => p.User)
+                .ToListAsync();
+
+            var response = ventas.Select(v => new VentasResponseModel
+            {
+                VentaDId = v.VentaDId,
+                ItemsId = v.ItemsId ,
+                ItemsName = v.Items.Name,
+                IdPrev = v.IdPrev,
+                UserId = v.Prev.User != null ? v.Prev.User.IdUser : 0,
+                UserName = v.Prev.User != null ? v.Prev.User.Name : "No asignado",
+                Total = v.Total
+            }).ToList();
+
+            return response;
         }
 
-        // GET by ID
+        // GET: api/Ventas/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Ventas>> GetObjectsVentas(int id)
+        public async Task<ActionResult<VentasResponseModel>> GetVenta(int id)
         {
-            var objectsVentas = await _context.Ventas.FindAsync(id);
+            var venta = await _context.Ventas
+                .Include(v => v.Items)
+                .Include(v => v.Prev)
+                    .ThenInclude(p => p.User)
+                .FirstOrDefaultAsync(v => v.VentaDId == id);
 
-            if (objectsVentas == null)
+            if (venta == null)
             {
                 return NotFound();
             }
 
-            return objectsVentas;
+            var response = new VentasResponseModel
+            {
+                VentaDId = venta.VentaDId,
+                ItemsId = venta.ItemsId,
+                ItemsName = venta.Items.Name,
+                IdPrev = venta.IdPrev,
+                UserId = venta.Prev.User != null ? venta.Prev.User.IdUser : 0,
+                UserName = venta.Prev.User != null ? venta.Prev.User.Name : "No asignado",
+                Total = venta.Total
+            };
+
+            return response;
         }
 
-        // PUT
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutObjectsVentas(int id, Ventas objectsVentas)
+        // POST: api/Ventas
+        [HttpPost]
+        public async Task<ActionResult<Ventas>> PostVenta(VentasInputModel inputModel)
         {
-            if (id != objectsVentas.Id)
+            var prev = await _context.PreV.FirstOrDefaultAsync(p => p.PrevId == inputModel.IdPrev);
+            if (prev == null)
+            {
+                return BadRequest("La PreV especificada no existe.");
+            }
+
+            var items = await _context.Items
+                .Where(i => inputModel.ItemsIds.Contains(i.IdItems))
+                .ToListAsync();
+
+            if (items.Count != inputModel.ItemsIds.Count)
+            {
+                return BadRequest("Algunos de los Items especificados no existen.");
+            }
+
+            var venta = new Ventas
+            {
+                IdPrev = inputModel.IdPrev,
+                Total = inputModel.Total
+            };
+
+            foreach (var itemId in inputModel.ItemsIds)
+            {
+                venta.ItemsId = itemId;
+                _context.Ventas.Add(venta);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetVenta), new { id = venta.VentaDId }, venta);
+        }
+
+        // PUT: api/Ventas/5
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutVenta(int id, Ventas venta)
+        {
+            if (id != venta.VentaDId)
             {
                 return BadRequest();
             }
 
-            _context.Entry(objectsVentas).State = EntityState.Modified;
+            _context.Entry(venta).State = EntityState.Modified;
 
             try
             {
@@ -60,7 +125,7 @@ namespace Ecommerse.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!ObjectsVentasExists(id))
+                if (!VentaExists(id))
                 {
                     return NotFound();
                 }
@@ -69,40 +134,47 @@ namespace Ecommerse.Controllers
                     throw;
                 }
             }
-            var response = NoContent();
-            return response;
+
+            return NoContent();
         }
 
-        // POST:
-        [HttpPost]
-        public async Task<ActionResult<Ventas>> PostObjectsVentas(Ventas objectsVentas)
+        // DELETE: api/Ventas/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteVenta(int id)
         {
-            _context.Ventas.Add(objectsVentas);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetObjectsVentas", new { id = objectsVentas.Id }, objectsVentas);
-        }
-
-        // DELETE:
-        [HttpDelete("{id}")]  
-        public async Task<IActionResult> DeleteObjectsVentas(int id)
-        {
-            var objectsVentas = await _context.Ventas.FindAsync(id);
-            if (objectsVentas == null)
+            var venta = await _context.Ventas.FindAsync(id);
+            if (venta == null)
             {
                 return NotFound();
             }
 
-            _context.Ventas.Remove(objectsVentas);
+            _context.Ventas.Remove(venta);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        private bool ObjectsVentasExists(int id)
+        private bool VentaExists(int id)
         {
-            return _context.Ventas.Any(e => e.Id == id);
+            return _context.Ventas.Any(e => e.VentaDId == id);
         }
+    }
 
+    public class VentasInputModel
+    {
+        public List<int> ItemsIds { get; set; } // Lista de IDs de Items
+        public int IdPrev { get; set; }
+        public int Total { get; set; }
+    }
+
+    public class VentasResponseModel
+    {
+        public int VentaDId { get; set; }
+        public int ItemsId { get; set; }
+        public string ItemsName { get; set; }
+        public int IdPrev { get; set; }
+        public int UserId { get; set; }
+        public string UserName { get; set; }
+        public int Total { get; set; }
     }
 }

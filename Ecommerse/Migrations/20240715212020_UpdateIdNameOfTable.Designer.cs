@@ -4,6 +4,7 @@ using Ecommerse.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerse.Migrations
 {
     [DbContext(typeof(Central))]
-    partial class CentralModelSnapshot : ModelSnapshot
+    [Migration("20240715212020_UpdateIdNameOfTable")]
+    partial class UpdateIdNameOfTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,15 +71,15 @@ namespace Ecommerse.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PrevId"));
 
+                    b.Property<int>("Comprador")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Fecha")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("PrevId");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("Comprador");
 
                     b.ToTable("PreV");
                 });
@@ -118,29 +121,29 @@ namespace Ecommerse.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VentaDId"));
 
-                    b.Property<int>("IdPrev")
+                    b.Property<int>("Cantidad")
                         .HasColumnType("int");
 
-                    b.Property<int>("ItemsId")
+                    b.Property<int>("EcommerceId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Total")
+                    b.Property<int>("VentaId")
                         .HasColumnType("int");
 
                     b.HasKey("VentaDId");
 
-                    b.HasIndex("IdPrev");
+                    b.HasIndex("EcommerceId");
 
-                    b.HasIndex("ItemsId");
+                    b.HasIndex("VentaId");
 
-                    b.ToTable("Ventas");
+                    b.ToTable("VentaDetalles");
                 });
 
             modelBuilder.Entity("Ecommerse.Models.PreV", b =>
                 {
                     b.HasOne("Ecommerse.Models.User", "User")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("Comprador")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -149,15 +152,15 @@ namespace Ecommerse.Migrations
 
             modelBuilder.Entity("Ecommerse.Models.Ventas", b =>
                 {
-                    b.HasOne("Ecommerse.Models.PreV", "Prev")
+                    b.HasOne("Ecommerse.Models.Items", "Items")
                         .WithMany()
-                        .HasForeignKey("IdPrev")
+                        .HasForeignKey("EcommerceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Ecommerse.Models.Items", "Items")
+                    b.HasOne("Ecommerse.Models.PreV", "Prev")
                         .WithMany()
-                        .HasForeignKey("ItemsId")
+                        .HasForeignKey("VentaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

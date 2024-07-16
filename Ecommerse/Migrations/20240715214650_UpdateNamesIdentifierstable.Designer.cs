@@ -4,6 +4,7 @@ using Ecommerse.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerse.Migrations
 {
     [DbContext(typeof(Central))]
-    partial class CentralModelSnapshot : ModelSnapshot
+    [Migration("20240715214650_UpdateNamesIdentifierstable")]
+    partial class UpdateNamesIdentifierstable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -118,13 +121,13 @@ namespace Ecommerse.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("VentaDId"));
 
+                    b.Property<int>("Cantidad")
+                        .HasColumnType("int");
+
                     b.Property<int>("IdPrev")
                         .HasColumnType("int");
 
                     b.Property<int>("ItemsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Total")
                         .HasColumnType("int");
 
                     b.HasKey("VentaDId");
@@ -133,7 +136,7 @@ namespace Ecommerse.Migrations
 
                     b.HasIndex("ItemsId");
 
-                    b.ToTable("Ventas");
+                    b.ToTable("VentaDetalles");
                 });
 
             modelBuilder.Entity("Ecommerse.Models.PreV", b =>

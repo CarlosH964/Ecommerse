@@ -26,6 +26,17 @@ namespace Ecommerse.Controllers
             return await _context.Items.ToListAsync();
         }
 
+        // GET: api/Items/instock
+        [HttpGet("instock")]
+        public async Task<ActionResult<IEnumerable<Items>>> GetItemsWithStock()
+        {
+            var itemsWithStock = await _context.Items
+                .Where(item => item.Stock > 0)
+                .ToListAsync();
+
+            return Ok(itemsWithStock);
+        }
+
         // GET: api/Items/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Items>> GetItems(int id)
@@ -49,6 +60,7 @@ namespace Ecommerse.Controllers
 
             return CreatedAtAction(nameof(GetItems), new { id = items.IdItems }, items);
         }
+
 
         // PUT: api/Items/5
         [HttpPut("{id}")]

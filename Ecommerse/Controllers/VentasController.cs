@@ -76,6 +76,11 @@ namespace Ecommerse.Controllers
         [HttpPost]
         public async Task<ActionResult<Ventas>> PostVenta(VentasInputModel inputModel)
         {
+            if (inputModel == null)
+            {
+                return BadRequest("The inputModel field is required.");
+            }
+
             var prev = await _context.PreV.FirstOrDefaultAsync(p => p.PrevId == inputModel.IdPrev);
             if (prev == null)
             {
@@ -162,7 +167,7 @@ namespace Ecommerse.Controllers
 
     public class VentasInputModel
     {
-        public List<int> ItemsIds { get; set; } // Lista de IDs de Items
+        public List<int> ItemsIds { get; set; }
         public int IdPrev { get; set; }
         public int Total { get; set; }
     }

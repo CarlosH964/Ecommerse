@@ -4,6 +4,7 @@ using Ecommerse.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerse.Migrations
 {
     [DbContext(typeof(Central))]
-    partial class CentralModelSnapshot : ModelSnapshot
+    [Migration("20240722153433_updtenavePrev")]
+    partial class updtenavePrev
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +24,27 @@ namespace Ecommerse.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Ecommerse.Models.InfoUserV", b =>
+                {
+                    b.Property<int>("PrevId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PrevId"));
+
+                    b.Property<DateTime>("Fecha")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("PrevId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("InfoUserVenta");
+                });
 
             modelBuilder.Entity("Ecommerse.Models.Items", b =>
                 {
@@ -42,9 +66,6 @@ namespace Ecommerse.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -61,27 +82,6 @@ namespace Ecommerse.Migrations
                     b.HasKey("IdItems");
 
                     b.ToTable("Items");
-                });
-
-            modelBuilder.Entity("Ecommerse.Models.PreV", b =>
-                {
-                    b.Property<int>("PrevId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PrevId"));
-
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("PrevId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PreV");
                 });
 
             modelBuilder.Entity("Ecommerse.Models.User", b =>
@@ -127,19 +127,22 @@ namespace Ecommerse.Migrations
                     b.Property<int>("ItemsId")
                         .HasColumnType("int");
 
+                    b.Property<int>("PrevId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Total")
                         .HasColumnType("int");
 
                     b.HasKey("VentaDId");
 
-                    b.HasIndex("IdPrev");
-
                     b.HasIndex("ItemsId");
+
+                    b.HasIndex("PrevId");
 
                     b.ToTable("VentaProductos");
                 });
 
-            modelBuilder.Entity("Ecommerse.Models.PreV", b =>
+            modelBuilder.Entity("Ecommerse.Models.InfoUserV", b =>
                 {
                     b.HasOne("Ecommerse.Models.User", "User")
                         .WithMany()
@@ -152,16 +155,16 @@ namespace Ecommerse.Migrations
 
             modelBuilder.Entity("Ecommerse.Models.Ventas", b =>
                 {
-                    b.HasOne("Ecommerse.Models.PreV", "Prev")
-                        .WithMany()
-                        .HasForeignKey("IdPrev")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Ecommerse.Models.Items", "Items")
                         .WithMany()
                         .HasForeignKey("ItemsId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Ecommerse.Models.InfoUserV", "Prev")
+                        .WithMany()
+                        .HasForeignKey("PrevId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Items");

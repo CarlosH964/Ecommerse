@@ -23,7 +23,7 @@ namespace Ecommerse.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<VentasResponseModel>>> GetVentas()
         {
-            var ventas = await _context.Ventas
+            var ventas = await _context.VentaProductos
                 .Include(v => v.Items)
                 .Include(v => v.Prev)
                     .ThenInclude(p => p.User)
@@ -47,7 +47,7 @@ namespace Ecommerse.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<VentasResponseModel>> GetVenta(int id)
         {
-            var venta = await _context.Ventas
+            var venta = await _context.VentaProductos
                 .Include(v => v.Items)
                 .Include(v => v.Prev)
                     .ThenInclude(p => p.User)
@@ -73,6 +73,7 @@ namespace Ecommerse.Controllers
         }
 
         // POST: api/Ventas
+        // POST: api/Ventas
         [HttpPost]
         public async Task<ActionResult<Ventas>> PostVenta(VentasInputModel inputModel)
         {
@@ -81,12 +82,14 @@ namespace Ecommerse.Controllers
                 return BadRequest("The inputModel field is required.");
             }
 
+            // Verificar si el registro PreV existe
             var prev = await _context.PreV.FirstOrDefaultAsync(p => p.PrevId == inputModel.IdPrev);
             if (prev == null)
             {
                 return BadRequest("La PreV especificada no existe.");
             }
 
+            // Verificar si todos los Items existen
             var items = await _context.Items
                 .Where(i => inputModel.ItemsIds.Contains(i.IdItems))
                 .ToListAsync();
@@ -96,22 +99,31 @@ namespace Ecommerse.Controllers
                 return BadRequest("Algunos de los Items especificados no existen.");
             }
 
-            var venta = new Ventas
-            {
-                IdPrev = inputModel.IdPrev,
-                Total = inputModel.Total
-            };
+            // Crear una lista para las ventas
+            var ventas = new List<Ventas>();
 
+            // Crear una instancia de Ventas para cada Item
             foreach (var itemId in inputModel.ItemsIds)
             {
-                venta.ItemsId = itemId;
-                _context.Ventas.Add(venta);
+                var venta = new Ventas
+                {
+                    IdPrev = inputModel.IdPrev,
+                    ItemsId = itemId,
+                    Total = inputModel.Total
+                };
+
+                ventas.Add(venta);
             }
+
+            // Añadir las ventas al contexto
+            _context.VentaProductos.AddRange(ventas);
 
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetVenta), new { id = venta.VentaDId }, venta);
+            // Retornar la primera venta creada
+            return CreatedAtAction(nameof(GetVenta), new { id = ventas.First().VentaDId }, ventas.First());
         }
+
 
         // PUT: api/Ventas/5
         [HttpPut("{id}")]
@@ -147,13 +159,13 @@ namespace Ecommerse.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteVenta(int id)
         {
-            var venta = await _context.Ventas.FindAsync(id);
+            var venta = await _context.VentaProductos.FindAsync(id);
             if (venta == null)
             {
                 return NotFound();
             }
 
-            _context.Ventas.Remove(venta);
+            _context.VentaProductos.Remove(venta);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -161,7 +173,7 @@ namespace Ecommerse.Controllers
 
         private bool VentaExists(int id)
         {
-            return _context.Ventas.Any(e => e.VentaDId == id);
+            return _context.VentaProductos.Any(e => e.VentaDId == id);
         }
     }
 

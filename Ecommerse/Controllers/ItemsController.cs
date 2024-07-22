@@ -32,9 +32,21 @@ namespace Ecommerse.Controllers
         {
             var itemsWithStock = await _context.Items
                 .Where(item => item.Stock > 0)
+                .Where(item => !item.IsDeleted)
                 .ToListAsync();
 
             return Ok(itemsWithStock);
+        }
+
+        // GET: api/Items/IsDelete
+        [HttpGet("notdelete")]
+        public async Task<ActionResult<IEnumerable<Items>>> GetItemsIsNotDelete()
+        {
+            var GetItemsIsNotDelete = await _context.Items
+                .Where(item => !item.IsDeleted)
+                .ToListAsync();
+
+            return Ok(GetItemsIsNotDelete);
         }
 
         // GET: api/Items/5
@@ -59,6 +71,37 @@ namespace Ecommerse.Controllers
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetItems), new { id = items.IdItems }, items);
+        }
+
+        [HttpPatch("{id}/softdelete")]
+        public async Task<IActionResult> SoftDeleteItem(int id)
+        {
+            var item = await _context.Items.FindAsync(id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+
+            item.IsDeleted = true;
+            _context.Entry(item).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ItemsExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
 
@@ -112,5 +155,6 @@ namespace Ecommerse.Controllers
         {
             return _context.Items.Any(e => e.IdItems == id);
         }
+
     }
 }

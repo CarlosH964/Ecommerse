@@ -12,7 +12,7 @@ namespace Ecommerse.Models
         public int ItemsId { get; set; }
         public Items Items { get; set; }
 
-        [ForeignKey("Prev")]
+        [ForeignKey("PreV")]
         public int IdPrev { get; set; }
         public PreV Prev { get; set; }
 

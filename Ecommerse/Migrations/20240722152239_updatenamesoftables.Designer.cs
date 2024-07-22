@@ -4,6 +4,7 @@ using Ecommerse.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerse.Migrations
 {
     [DbContext(typeof(Central))]
-    partial class CentralModelSnapshot : ModelSnapshot
+    [Migration("20240722152239_updatenamesoftables")]
+    partial class updatenamesoftables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,9 +44,6 @@ namespace Ecommerse.Migrations
                     b.Property<string>("Img")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -81,7 +81,7 @@ namespace Ecommerse.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("PreV");
+                    b.ToTable("InfoUserVenta");
                 });
 
             modelBuilder.Entity("Ecommerse.Models.User", b =>
@@ -155,13 +155,13 @@ namespace Ecommerse.Migrations
                     b.HasOne("Ecommerse.Models.PreV", "Prev")
                         .WithMany()
                         .HasForeignKey("IdPrev")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Ecommerse.Models.Items", "Items")
                         .WithMany()
                         .HasForeignKey("ItemsId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Items");

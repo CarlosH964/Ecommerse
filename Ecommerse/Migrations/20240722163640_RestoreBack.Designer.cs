@@ -4,6 +4,7 @@ using Ecommerse.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerse.Migrations
 {
     [DbContext(typeof(Central))]
-    partial class CentralModelSnapshot : ModelSnapshot
+    [Migration("20240722163640_RestoreBack")]
+    partial class RestoreBack
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,9 +44,6 @@ namespace Ecommerse.Migrations
                     b.Property<string>("Img")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -127,14 +127,17 @@ namespace Ecommerse.Migrations
                     b.Property<int>("ItemsId")
                         .HasColumnType("int");
 
+                    b.Property<int>("PrevId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Total")
                         .HasColumnType("int");
 
                     b.HasKey("VentaDId");
 
-                    b.HasIndex("IdPrev");
-
                     b.HasIndex("ItemsId");
+
+                    b.HasIndex("PrevId");
 
                     b.ToTable("VentaProductos");
                 });
@@ -152,16 +155,16 @@ namespace Ecommerse.Migrations
 
             modelBuilder.Entity("Ecommerse.Models.Ventas", b =>
                 {
-                    b.HasOne("Ecommerse.Models.PreV", "Prev")
-                        .WithMany()
-                        .HasForeignKey("IdPrev")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("Ecommerse.Models.Items", "Items")
                         .WithMany()
                         .HasForeignKey("ItemsId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Ecommerse.Models.PreV", "Prev")
+                        .WithMany()
+                        .HasForeignKey("PrevId")
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Items");
